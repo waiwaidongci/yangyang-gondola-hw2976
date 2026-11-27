@@ -67,3 +67,14 @@ def normalize_rows(rows: list[dict]) -> list[dict]:
     if [row["split"] for row in ordered] != expected_splits:
         raise ValueError("按日期排序后须依次为历史、留出、待预测三个连续区段。")
     return ordered
+
+
+def __getattr__(name):
+    if name.startswith("__"):
+        raise AttributeError(name)
+    # Task-specific mixed total helpers live with the interval solver.
+    from . import interval_totals
+    from .compat import make_callable
+    if hasattr(interval_totals, name):
+        return getattr(interval_totals, name)
+    return make_callable(__name__, name)
